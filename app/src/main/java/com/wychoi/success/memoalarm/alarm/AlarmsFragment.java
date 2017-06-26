@@ -56,5 +56,6 @@ public class AlarmsFragment extends BaseFragment {
     public void onFabClick() {
         Log.d("wychoi","AlarmsFragment"); // OK
         //여기에 알람 생성하는 매소드 만들어서 넣자!
+        //mTimePickerDialogController.show(0, 0, makeTimePickerDialogTag());
     }
 }
