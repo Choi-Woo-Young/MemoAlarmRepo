@@ -29,6 +29,7 @@
             android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
     </FrameLayout>
 
     <LinearLayout
@@ -52,6 +53,20 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/tab_height"
             android:background="@color/primary" />
+
     </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:visibility="visible"
+        app:fabSize="auto"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:tint="@android:color/white"
+        app:srcCompat="@android:drawable/ic_menu_add"
+        />
 
     </com.wychoi.success.memoalarm.observablescrollview.TouchInterceptionFrameLayout>

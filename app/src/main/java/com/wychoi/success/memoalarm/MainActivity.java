@@ -2,6 +2,8 @@ package com.wychoi.success.memoalarm;
 
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -43,20 +45,7 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-*/
         //layout 후킹
         setContentView(R.layout.activity_viewpagertab2);
         //액션바 layout 후킹
@@ -72,6 +61,15 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
         mPager = (ViewPager) findViewById(R.id.pager);
         //pager에 pager Adater 싯팅
         mPager.setAdapter(mPagerAdapter);
+        
+
+
+
+
+
+
+
+
 
         // Padding for ViewPager must be set outside the ViewPager itself
         // because with padding, EdgeEffect of ViewPager become strange.
@@ -102,6 +100,15 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
         //TouchInterception 리스너 셋팅
         mInterceptionLayout.setScrollInterceptionListener(mInterceptionListener);
 
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
     }
 
     //TouchInterception 리스너
@@ -132,8 +139,7 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
                 return false;
             }
 
-            //메인 엑티비티가 움직일 수 있는 조건인 경우
-            // If interceptionLayout can move, it should intercept.
+             // If interceptionLayout can move, it should intercept.
             // And once it begins to move, horizontal scroll shouldn't work any longer.
             int toolbarHeight = mToolbarView.getHeight();
 
@@ -367,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
                     f = new ViewPagerTab2ScrollViewFragment();
                     break;
                 case 1:
-                    f = new ViewPagerTab2ListViewFragment();
+                    f = new AlarmsFragment();
                     break;
                 case 2:
                     f = new ViewPagerTab2RecyclerViewFragment();
