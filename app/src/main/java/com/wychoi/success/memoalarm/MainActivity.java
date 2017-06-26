@@ -4,11 +4,11 @@ import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,12 +30,14 @@ import com.wychoi.success.memoalarm.observablescrollview.TouchInterceptionFrameL
 
 public class MainActivity extends AppCompatActivity implements ObservableScrollViewCallbacks {
 
-    private boolean mScrolled;
-    private View mToolbarView;
+
     private TouchInterceptionFrameLayout mInterceptionLayout;
+    private View mToolbarView;
     private ViewPager mPager;
     private NavigationAdapter mPagerAdapter;
+
     private int mSlop;
+    private boolean mScrolled;
     private ScrollState mLastScrollState;
 
     @Override
@@ -55,50 +57,155 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
             }
         });
 */
+        //layout 후킹
         setContentView(R.layout.activity_viewpagertab2);
-
+        //액션바 layout 후킹
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-
+        // header의 높이 효과 적용 *Elevation(높이효과)
         ViewCompat.setElevation(findViewById(R.id.header), getResources().getDimension(R.dimen.toolbar_elevation));
+
+        //툴바 layout 후킹
         mToolbarView = findViewById(R.id.toolbar);
+        //pager Adapter 생성
         mPagerAdapter = new NavigationAdapter(getSupportFragmentManager());
+        //layout에 ViewPager 후킹
         mPager = (ViewPager) findViewById(R.id.pager);
+        //pager에 pager Adater 싯팅
         mPager.setAdapter(mPagerAdapter);
+
         // Padding for ViewPager must be set outside the ViewPager itself
         // because with padding, EdgeEffect of ViewPager become strange.
         final int tabHeight = getResources().getDimensionPixelSize(R.dimen.tab_height);
+        //FrameLayout안에 ViewPager 위치시키고, FrameLayout의 상단 페딩으로 위치 셋팅
         findViewById(R.id.pager_wrapper).setPadding(0, getActionBarSize() + tabHeight, 0, 0);
 
+        //SlidingTabLayout 후킹
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        //SlidingTabLayout에 customTabView 셋팅
         slidingTabLayout.setCustomTabView(R.layout.tab_indicator, android.R.id.text1);
-        slidingTabLayout.setSelectedIndicatorColors(getResources().getColor(R.color.accent));
+        //선택된 tab indicator를 표시할 색 셋팅
+        slidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(this, R.color.accent));
+        //slidingTabLayout.setSelectedIndicatorColors(getResources().getColor(R.color.accent));
+
+        //setDistributeEvenly() method is actually needed to make fixed tabs
         slidingTabLayout.setDistributeEvenly(true);
+        //slidingTabLayout를 ViewPager와 연결
         slidingTabLayout.setViewPager(mPager);
 
+        //ViewConfiguration: Contains methods to standard constants used in the UI for timeouts, sizes, and distances.
         ViewConfiguration vc = ViewConfiguration.get(this);
+        //Distance in pixels a touch can wander before we think the user is scrolling
+        //사용자가 스크롤하고 있다고 생각하기 전에 거리가 픽셀 단위로 표시됩니다.
         mSlop = vc.getScaledTouchSlop();
+        //최상위 Layout인 TouchInterceptionFrameLayout 후킹
         mInterceptionLayout = (TouchInterceptionFrameLayout) findViewById(R.id.container);
+        //TouchInterception 리스너 셋팅
         mInterceptionLayout.setScrollInterceptionListener(mInterceptionListener);
 
     }
 
-    //wychoi
-    int getActionBarSize() {
-        TypedValue typedValue = new TypedValue();
-        int[] textSizeAttr = new int[]{R.attr.actionBarSize};
-        int indexOfAttrTextSize = 0;
-        TypedArray a = obtainStyledAttributes(typedValue.data, textSizeAttr);
-        int actionBarSize = a.getDimensionPixelSize(indexOfAttrTextSize, -1);
-        a.recycle();
-        return actionBarSize;
-    }
+    //TouchInterception 리스너
+    private TouchInterceptionFrameLayout.TouchInterceptionListener mInterceptionListener = new TouchInterceptionFrameLayout.TouchInterceptionListener() {
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+        //Check if this event as provided to the parent view's onInterceptTouchEvent should cause the parent to intercept the touch event stream.
+        //부모 뷰의 onInterceptTouchEvent에게 제공된 이 이벤트가 부모뷰에 터치 이벤트 스트림을 인터럽트를 발생 시켜야 하는지 체크
+
+        /**
+         * Determine whether the layout should intercept this event.
+         * @param ev     Motion event.
+         * @param moving True if this event is ACTION_MOVE type.
+         * @param diffX  Difference between previous X and current X, if moving is true.
+         * @param diffY  Difference between previous Y and current Y, if moving is true.
+         * @return True if the layout should intercept.
+         */
+        @Override
+        public boolean shouldInterceptTouchEvent(MotionEvent ev, boolean moving, float diffX, float diffY) {
+            //Math.abs : 절대값
+            if (!mScrolled && mSlop < Math.abs(diffX) && Math.abs(diffY) < Math.abs(diffX)) {
+                // Horizontal scroll is maybe handled by ViewPager
+                return false;
+            }
+            //현재 프레임에 포함된 뷰를 찾아서 Scrollable 객체로 리턴
+            Scrollable scrollable = getCurrentScrollable();
+            if (scrollable == null) {
+                mScrolled = false;
+                return false;
+            }
+
+            //메인 엑티비티가 움직일 수 있는 조건인 경우
+            // If interceptionLayout can move, it should intercept.
+            // And once it begins to move, horizontal scroll shouldn't work any longer.
+            int toolbarHeight = mToolbarView.getHeight();
+
+            //이동된 Y??
+            int translationY = (int) ViewHelper.getTranslationY(mInterceptionLayout);
+
+            boolean scrollingUp = 0 < diffY;
+            boolean scrollingDown = diffY < 0;
+
+            if (scrollingUp) {
+                if (translationY < 0) {
+                    mScrolled = true;
+                    mLastScrollState = ScrollState.UP;
+                    return true;
+                }
+            } else if (scrollingDown) {
+                if (-toolbarHeight < translationY) {
+                    mScrolled = true;
+                    mLastScrollState = ScrollState.DOWN;
+                    return true;
+                }
+            }
+            mScrolled = false;
+            return false;
+        }
+
+        //이벤트 callback 메소드
+
+        /**
+         * Called if the down motion event is intercepted by this layout.
+         *
+         * @param ev Motion event.
+         */
+        @Override
+        public void onDownMotionEvent(MotionEvent ev) {
+        }
+
+        /**
+         * Called if the move motion event is intercepted by this layout.
+         *
+         * @param ev    Motion event.
+         * @param diffX Difference between previous X and current X.
+         * @param diffY Difference between previous Y and current Y.
+         */
+        @Override
+        public void onMoveMotionEvent(MotionEvent ev, float diffX, float diffY) {
+            float translationY = ScrollUtils.getFloat(ViewHelper.getTranslationY(mInterceptionLayout) + diffY, -mToolbarView.getHeight(), 0);
+            ViewHelper.setTranslationY(mInterceptionLayout, translationY);
+            if (translationY < 0) {
+                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mInterceptionLayout.getLayoutParams();
+                lp.height = (int) (-translationY + getScreenHeight());
+                mInterceptionLayout.requestLayout();
+            }
+        }
+
+        //android.R.id.content 연결되어 있는 XML로 가면 auto_complete_list.xml인데 프로젝트 목록에는 없음.
+        private int getScreenHeight() {
+            return findViewById(android.R.id.content).getHeight();
+        }
+
+        /**
+         * Called if the up (or cancel) motion event is intercepted by this layout.
+         *
+         * @param ev Motion event.
+         */
+        @Override
+        public void onUpOrCancelMotionEvent(MotionEvent ev) {
+            mScrolled = false;
+            adjustToolbar(mLastScrollState);
+        }
+    };
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -121,6 +228,56 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
 
     }
 
+    @Override
+    public void onDownMotionEvent() {
+    }
+
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {//1
+        if (!mScrolled) {
+            // This event can be used only when TouchInterceptionFrameLayout
+            // doesn't handle the consecutive events.
+            adjustToolbar(scrollState);
+        }
+    }
+
+    //옵션 메뉴
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////
+
+
+    //현재 프레임에 포함된 뷰를 찾아서 Scrollable 객체로 리턴
+    private Scrollable getCurrentScrollable() {
+        Fragment fragment = getCurrentFragment();
+        if (fragment == null) {
+            return null;
+        }
+        View view = fragment.getView();
+        if (view == null) {
+            return null;
+        }
+        //Interface for providing common API for observable and scrollable widgets.
+        return (Scrollable) view.findViewById(R.id.scroll);
+    }
+
+    //엑션바 픽셀 사이즈 리턴
+    int getActionBarSize() {
+        TypedValue typedValue = new TypedValue();
+        int[] textSizeAttr = new int[]{R.attr.actionBarSize};
+        int indexOfAttrTextSize = 0;
+        TypedArray a = obtainStyledAttributes(typedValue.data, textSizeAttr);
+        int actionBarSize = a.getDimensionPixelSize(indexOfAttrTextSize, -1);
+        a.recycle();
+        return actionBarSize;
+    }
+
 
     private void animateToolbar(final float toY) {
         float layoutTranslationY = ViewHelper.getTranslationY(mInterceptionLayout);
@@ -134,11 +291,8 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
                     if (translationY < 0) {
                         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mInterceptionLayout.getLayoutParams();
 
-                        //wychoi: getSscreenHeight() 사용 불가해서 수정함.
-                        DisplayMetrics displayMetrics = new DisplayMetrics();
-                        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                        float screenHeight = displayMetrics.heightPixels / displayMetrics.ydpi;
-                        lp.height = (int) (-translationY + screenHeight);
+                        lp.height = (int) (-translationY + findViewById(android.R.id.content).getHeight());
+                        //lp.height = (int) (-translationY + getSscreenHeight());
 
                         mInterceptionLayout.requestLayout();
                     }
@@ -148,10 +302,6 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
         }
     }
 
-
-    @Override
-    public void onDownMotionEvent() {
-    }
 
     private boolean toolbarIsHidden() {
         return ViewHelper.getTranslationY(mInterceptionLayout) == -mToolbarView.getHeight();
@@ -165,90 +315,12 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
         return ViewHelper.getTranslationY(mInterceptionLayout) == 0;
     }
 
-
     private void showToolbar() {
         animateToolbar(0);
     }
 
     private void hideToolbar() {
         animateToolbar(-mToolbarView.getHeight());
-    }
-
-
-    private TouchInterceptionFrameLayout.TouchInterceptionListener mInterceptionListener = new TouchInterceptionFrameLayout.TouchInterceptionListener() {
-        @Override
-        public boolean shouldInterceptTouchEvent(MotionEvent ev, boolean moving, float diffX, float diffY) {
-            if (!mScrolled && mSlop < Math.abs(diffX) && Math.abs(diffY) < Math.abs(diffX)) {
-                // Horizontal scroll is maybe handled by ViewPager
-                return false;
-            }
-
-            Scrollable scrollable = getCurrentScrollable();
-            if (scrollable == null) {
-                mScrolled = false;
-                return false;
-            }
-
-            // If interceptionLayout can move, it should intercept.
-            // And once it begins to move, horizontal scroll shouldn't work any longer.
-            int toolbarHeight = mToolbarView.getHeight();
-            int translationY = (int) ViewHelper.getTranslationY(mInterceptionLayout);
-            boolean scrollingUp = 0 < diffY;
-            boolean scrollingDown = diffY < 0;
-            if (scrollingUp) {
-                if (translationY < 0) {
-                    mScrolled = true;
-                    mLastScrollState = ScrollState.UP;
-                    return true;
-                }
-            } else if (scrollingDown) {
-                if (-toolbarHeight < translationY) {
-                    mScrolled = true;
-                    mLastScrollState = ScrollState.DOWN;
-                    return true;
-                }
-            }
-            mScrolled = false;
-            return false;
-        }
-
-        @Override
-        public void onDownMotionEvent(MotionEvent ev) {
-        }
-
-        @Override
-        public void onMoveMotionEvent(MotionEvent ev, float diffX, float diffY) {
-
-            float translationY = ScrollUtils.getFloat(ViewHelper.getTranslationY(mInterceptionLayout) + diffY, -mToolbarView.getHeight(), 0);
-            ViewHelper.setTranslationY(mInterceptionLayout, translationY);
-            if (translationY < 0 ) {
-                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mInterceptionLayout.getLayoutParams();
-                lp.height = (int) (-translationY + getScreenHeight());
-                mInterceptionLayout.requestLayout();
-            }
-
-        }
-
-        protected int getScreenHeight() {
-            return findViewById(android.R.id.content).getHeight();
-        }
-
-        @Override
-        public void onUpOrCancelMotionEvent(MotionEvent ev) {
-            mScrolled = false; //2
-            //wychoi 화면 백지화 문제 발생으로 임시 주석처리
-            //adjustToolbar(mLastScrollState);
-        }
-    };
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {//1
-        if (!mScrolled) {
-            // This event can be used only when TouchInterceptionFrameLayout
-            // doesn't handle the consecutive events.
-            //wychoi 화면 백지화 문제 발생으로 임시 주석처리
-            //adjustToolbar(scrollState);
-        }
     }
 
 
@@ -274,29 +346,15 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
         }
     }
 
-
-    private Scrollable getCurrentScrollable() {
-        Fragment fragment = getCurrentFragment();
-        if (fragment == null) {
-            return null;
-        }
-        View view = fragment.getView();
-        if (view == null) {
-            return null;
-        }
-        return (Scrollable) view.findViewById(R.id.scroll);
-    }
-
-
     /**
      * This adapter provides two types of fragments as an example.
      * {@linkplain #createItem(int)} should be modified if you use this example for your app.
      */
     private static class NavigationAdapter extends CacheFragmentStatePagerAdapter {
 
-        private static final String[] TITLES = new String[]{"메모", "알람", "개인분석", "비교분석", "기타"};
+        private static final String[] TITLES = new String[]{"메모", "알람", "분석"};
 
-        public NavigationAdapter(FragmentManager fm) {
+        private NavigationAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -335,6 +393,5 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
             return TITLES[position];
         }
     }
-
 
 }
