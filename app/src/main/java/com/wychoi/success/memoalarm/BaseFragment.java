@@ -82,4 +82,8 @@ public abstract class BaseFragment extends Fragment {
     protected void setDummyDataWithHeader(RecyclerView recyclerView, View headerView) {
         recyclerView.setAdapter(new SimpleHeaderRecyclerAdapter(getActivity(), getDummyData(), headerView));
     }
+
+    //fab 이벤트 발생 시 어느 Fragment에서 클릭했냐에 따라 다른 로직 실행 시키키 위해
+    //모든 Fragment가 상속하고 있는 BasicFragment에 fab 눌렀을 떄 실행 시킬 로직 정의
+    public abstract void onFabClick();
 }

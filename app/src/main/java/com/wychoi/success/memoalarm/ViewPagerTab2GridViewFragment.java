@@ -41,4 +41,9 @@ public class ViewPagerTab2GridViewFragment extends BaseFragment {
         }
         return view;
     }
+
+    @Override
+    public void onFabClick() {
+
+    }
 }

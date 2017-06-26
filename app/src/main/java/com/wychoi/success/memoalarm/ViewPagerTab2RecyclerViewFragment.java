@@ -44,4 +44,9 @@ public class ViewPagerTab2RecyclerViewFragment extends BaseFragment {
         }
         return view;
     }
+
+    @Override
+    public void onFabClick() {
+
+    }
 }

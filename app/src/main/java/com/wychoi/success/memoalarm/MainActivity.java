@@ -26,6 +26,7 @@ import android.widget.FrameLayout;
 import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
+import com.wychoi.success.memoalarm.alarm.AlarmsFragment;
 import com.wychoi.success.memoalarm.observablescrollview.CacheFragmentStatePagerAdapter;
 import com.wychoi.success.memoalarm.observablescrollview.ObservableScrollViewCallbacks;
 import com.wychoi.success.memoalarm.observablescrollview.ScrollState;
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
         mPager = (ViewPager) findViewById(R.id.pager);
         //pager에 pager Adater 셋팅
         mPager.setAdapter(mPagerAdapter);
-        mPager.addOnPageChangeListener(viewPagerSimpleOnPageChangeListener);
+        //mPager.addOnPageChangeListener(viewPagerSimpleOnPageChangeListener);
 
         // Padding for ViewPager must be set outside the ViewPager itself
         // because with padding, EdgeEffect of ViewPager become strange.
@@ -99,14 +100,24 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
         mInterceptionLayout = (TouchInterceptionFrameLayout) findViewById(R.id.container);
         //TouchInterception 리스너 셋팅
         mInterceptionLayout.setScrollInterceptionListener(mInterceptionListener);
-
-
         mFab = (FloatingActionButton) findViewById(fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+
+                Fragment f = mPagerAdapter.getItem(mPager.getCurrentItem());
+                Snackbar.make(view, "Fragment:"+ f.getClass(), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                //알람 Fragment 에서 fab 클릭한 경우
+                if(f instanceof AlarmsFragment){
+                    ((AlarmsFragment) f).onFabClick();
+                }
+                /*
+                if (f instanceof RecyclerViewFragment) {
+                    ((RecyclerViewFragment) f).onFabClick();
+                }
+                */
+
             }
         });
 
@@ -455,13 +466,13 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
             final int pattern = position % 5;
             switch (pattern) {
                 case 0:
-                    f = new ViewPagerTab2ScrollViewFragment();
+                    f = new ViewPagerTab2RecyclerViewFragment();
                     break;
                 case 1:
                     f = new AlarmsFragment();
                     break;
                 case 2:
-                    f = new ViewPagerTab2RecyclerViewFragment();
+                    f = new ViewPagerTab2ScrollViewFragment();
                     break;
                 case 3:
                     f = new ViewPagerTab2GridViewFragment();

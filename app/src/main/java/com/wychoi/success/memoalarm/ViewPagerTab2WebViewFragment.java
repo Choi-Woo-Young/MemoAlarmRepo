@@ -40,4 +40,9 @@ public class ViewPagerTab2WebViewFragment extends BaseFragment {
         }
         return view;
     }
+
+    @Override
+    public void onFabClick() {
+
+    }
 }

@@ -39,4 +39,9 @@ public class ViewPagerTab2ScrollViewFragment extends BaseFragment {
         }
         return view;
     }
+
+    @Override
+    public void onFabClick() {
+
+    }
 }
