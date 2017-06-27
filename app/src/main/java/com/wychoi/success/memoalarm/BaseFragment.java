@@ -31,6 +31,7 @@ import com.wychoi.success.memoalarm.observablescrollview.ObservableGridView;
 import java.util.ArrayList;
 
 public abstract class BaseFragment extends Fragment {
+
     public static ArrayList<String> getDummyData() {
         return BaseActivity.getDummyData();
     }
