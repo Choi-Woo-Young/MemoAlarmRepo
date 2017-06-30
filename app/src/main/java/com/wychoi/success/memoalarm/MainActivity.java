@@ -1,5 +1,6 @@
 package com.wychoi.success.memoalarm;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -27,6 +28,8 @@ import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
 import com.wychoi.success.memoalarm.alarm.AlarmsFragment;
+import com.wychoi.success.memoalarm.memo.MemoListViewFragment;
+import com.wychoi.success.memoalarm.memo.MemoRegiterActivity;
 import com.wychoi.success.memoalarm.observablescrollview.CacheFragmentStatePagerAdapter;
 import com.wychoi.success.memoalarm.observablescrollview.ObservableScrollViewCallbacks;
 import com.wychoi.success.memoalarm.observablescrollview.ScrollState;
@@ -105,19 +108,23 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
             @Override
             public void onClick(View view) {
 
-                Fragment f = mPagerAdapter.getItem(mPager.getCurrentItem());
-                Snackbar.make(view, "Fragment:"+ f.getClass(), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
                 //알람 Fragment 에서 fab 클릭한 경우
-                if(f instanceof AlarmsFragment){
-                    ((AlarmsFragment) f).onFabClick();
-                }
-                /*
-                if (f instanceof RecyclerViewFragment) {
-                    ((RecyclerViewFragment) f).onFabClick();
-                }
-                */
+                int idx = mPager.getCurrentItem();
+                //if(f instanceof AlarmsFragment){
+                if(1 == idx){
 
+                    //Fragment f = mPagerAdapter.getItem(mPager.getCurrentItem());
+                    //((AlarmsFragment) f).onFabClick();
+
+                    Snackbar.make(view, "idx:"+ idx, Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+                else if (0 == idx) {
+
+                    Intent intent = new Intent(getApplicationContext(), MemoRegiterActivity.class);
+                    //intent.putExtra("MEMO_ITEM_JSONSTR",item.toString()); //이동 엑티비티에 데이터 전달
+                    startActivity(intent);
+                }
             }
         });
 
@@ -466,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
             final int pattern = position % 5;
             switch (pattern) {
                 case 0:
-                    f = new ViewPagerTab2RecyclerViewFragment();
+                    f = new MemoListViewFragment();
                     break;
                 case 1:
                     f = new AlarmsFragment();

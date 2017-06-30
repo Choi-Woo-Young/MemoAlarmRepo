@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-package com.wychoi.success.memoalarm;
+package com.wychoi.success.memoalarm.memo;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.wychoi.success.memoalarm.BaseFragment;
+import com.wychoi.success.memoalarm.R;
 import com.wychoi.success.memoalarm.observablescrollview.ObservableListView;
 import com.wychoi.success.memoalarm.observablescrollview.ObservableScrollViewCallbacks;
 
 
-public class ViewPagerTab2ListViewFragment extends BaseFragment {
+
+public class MemoListViewFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.memo_fragment_listview, container, false);
@@ -44,6 +48,9 @@ public class ViewPagerTab2ListViewFragment extends BaseFragment {
 
     @Override
     public void onFabClick() {
+        Log.d("wychoi","MemoListViewFragment"); // OK
+        //여기에 알람 생성하는 매소드 만들어서 넣자!
+        //mTimePickerDialogController.show(0, 0, makeTimePickerDialogTag());
 
     }
 }
