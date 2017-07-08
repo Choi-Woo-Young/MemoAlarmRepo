@@ -36,6 +36,7 @@ import com.wychoi.success.memoalarm.observablescrollview.ScrollState;
 import com.wychoi.success.memoalarm.observablescrollview.ScrollUtils;
 import com.wychoi.success.memoalarm.observablescrollview.Scrollable;
 import com.wychoi.success.memoalarm.observablescrollview.TouchInterceptionFrameLayout;
+import com.wychoi.success.memoalarm.util.NetworkService;
 
 import static com.wychoi.success.memoalarm.R.id.fab;
 
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
     private ScrollState mLastScrollState;
     FloatingActionButton mFab;
     private Drawable mAddItemDrawable;
+
+    static public NetworkService networkService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +132,15 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
         });
 
         mAddItemDrawable = ContextCompat.getDrawable(this, R.drawable.shadow);
+
+
+
+        ApplicationController application = ApplicationController.getInstance();
+        //application.buildNetworkService("192.168.219.161", 8080);
+        application.buildNetworkService("192.168.0.102", 8080);
+        //application.buildNetworkService("api.openweathermap.org", 80);
+        networkService = ApplicationController.getInstance().getNetworkService();
+
     }
 
 

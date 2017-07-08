@@ -26,9 +26,17 @@ dependencies {
     })
     compile group: 'com.nineoldandroids', name: 'library', version: '2.4.0'
 
+
+
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:25.3.1'
     compile 'com.melnykov:floatingactionbutton:1.0.7'
+
+    //Retrofit은 Square에서 만든 REST Api를 손쉽게 사용하기 위한 Java, Android 라이브러리 입니다.
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.google.code.gson:gson:2.7'
+
     testCompile 'junit:junit:4.12'
 }
