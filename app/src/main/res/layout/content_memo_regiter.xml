@@ -13,20 +13,15 @@
         android:layout_width="368dp"
         android:layout_height="495dp"
         android:orientation="vertical"
-        tools:layout_editor_absoluteY="8dp"
+        android:weightSum="1"
         tools:layout_editor_absoluteX="8dp"
-        android:weightSum="1">
+        tools:layout_editor_absoluteY="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextClock
-                android:id="@+id/textClock"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
         </LinearLayout>
 
         <TextView
@@ -36,11 +31,11 @@
             android:text="메모" />
 
         <MultiAutoCompleteTextView
-            android:id="@+id/multiAutoCompleteTextView"
+            android:id="@+id/TextView_contents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="MultiAutoCompleteTextView"
-            android:layout_weight="0.72" />
+            android:layout_weight="0.72"
+            android:text="MultiAutoCompleteTextView" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -165,7 +160,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/button_memo_reg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

@@ -61,7 +61,6 @@ public class MemoListViewFragment extends BaseFragment {
         memoListCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
                 if(response.isSuccessful()){
                     Log.d("wychoi","response.isSuccessful() :"+response.isSuccessful());
                     try {

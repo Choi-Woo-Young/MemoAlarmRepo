@@ -61,6 +61,13 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ApplicationController application = ApplicationController.getInstance();
+        application.buildNetworkService("192.168.219.115", 8080);
+        //application.buildNetworkService("192.168.0.102", 8080);
+        //application.buildNetworkService("api.openweathermap.org", 80);
+        networkService = ApplicationController.getInstance().getNetworkService();
+
+
         //layout 후킹
         setContentView(R.layout.activity_viewpagertab2);
         //액션바 layout 후킹
@@ -135,11 +142,6 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
 
 
 
-        ApplicationController application = ApplicationController.getInstance();
-        //application.buildNetworkService("192.168.219.161", 8080);
-        application.buildNetworkService("192.168.0.102", 8080);
-        //application.buildNetworkService("api.openweathermap.org", 80);
-        networkService = ApplicationController.getInstance().getNetworkService();
 
     }
 
