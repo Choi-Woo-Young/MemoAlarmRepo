@@ -69,6 +69,7 @@ public class MemoListViewFragment extends BaseFragment {
                         Log.d("wychoi","response.body().string(); :"+responseBodyString);
 
                         //JsonString을 Json객체로 parsing
+
                         JsonParser parser = new JsonParser();
                         JsonArray memoJsonArrayList = (JsonArray) parser.parse(responseBodyString);
                         ArrayList<MemoVO> memoList= new ArrayList<MemoVO>();
@@ -78,6 +79,7 @@ public class MemoListViewFragment extends BaseFragment {
                             memoVO.jsonObjectToMemoVO(memo.getAsJsonObject());
                             memoList.add(memoVO);
                         }
+
                         listView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, memoList));
                     } catch (IOException e) {
                         e.printStackTrace();

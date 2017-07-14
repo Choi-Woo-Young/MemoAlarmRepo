@@ -50,7 +50,7 @@ public class MemoRegiterActivity extends AppCompatActivity {
 
             Log.d("wychoi","memoVO: "+memoVO.toString());
             //GET
-            Call<ResponseBody> insertMemoCall = networkService.insert_memo(memoVO.toString());
+            Call<ResponseBody> insertMemoCall = networkService.insert_memo(memoVO);
             insertMemoCall.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
