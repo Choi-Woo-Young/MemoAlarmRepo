@@ -60,7 +60,7 @@ public class MemoRegiterActivity extends AppCompatActivity {
                             Log.d("wychoi","response.raw() :"+response.raw());
                             String responseBodyString = response.body().string();
                             Log.d("wychoi","response.body().string(); :"+responseBodyString);
-
+                            finish();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

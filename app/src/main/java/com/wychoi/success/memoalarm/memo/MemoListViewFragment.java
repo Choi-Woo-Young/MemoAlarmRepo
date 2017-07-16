@@ -45,17 +45,37 @@ import static com.wychoi.success.memoalarm.MainActivity.networkService;
 
 public class MemoListViewFragment extends BaseFragment {
 
+    ObservableListView listView = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.memo_fragment_listview, container, false);
-
         Activity parentActivity = getActivity();
-        final ObservableListView listView = (ObservableListView) view.findViewById(R.id.scroll);
+        listView = (ObservableListView) view.findViewById(R.id.scroll);
         listView.setTouchInterceptionViewGroup((ViewGroup) parentActivity.findViewById(R.id.container));
         if (parentActivity instanceof ObservableScrollViewCallbacks) {
             listView.setScrollViewCallbacks((ObservableScrollViewCallbacks) parentActivity);
         }
+        //메모 리스트 셋팅
+        setMemoList();
+        return view;
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 메모 리스트 셋팅
+        setMemoList();
+    }
+
+    @Override
+    public void onFabClick() {
+        Log.d("wychoi","MemoListViewFragment"); // OK
+    }
+
+
+    //메모 리스트 셋팅
+    public void setMemoList(){
         //GET
         Call<ResponseBody> memoListCall = networkService.get_memo_list();
         memoListCall.enqueue(new Callback<ResponseBody>() {
@@ -69,17 +89,16 @@ public class MemoListViewFragment extends BaseFragment {
                         Log.d("wychoi","response.body().string(); :"+responseBodyString);
 
                         //JsonString을 Json객체로 parsing
-
+                        ArrayList<MemoVO> memoList= new ArrayList<MemoVO>();
                         JsonParser parser = new JsonParser();
                         JsonArray memoJsonArrayList = (JsonArray) parser.parse(responseBodyString);
-                        ArrayList<MemoVO> memoList= new ArrayList<MemoVO>();
+
                         for(JsonElement memo : memoJsonArrayList){
                             Log.d("wychoi","memo :"+memo.toString());
                             MemoVO memoVO =  new MemoVO();
                             memoVO.jsonObjectToMemoVO(memo.getAsJsonObject());
                             memoList.add(memoVO);
                         }
-
                         listView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, memoList));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -88,22 +107,11 @@ public class MemoListViewFragment extends BaseFragment {
                     Log.d("wychoi","response.isSuccessful() :"+response.isSuccessful());
                 }
             }
-
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.d("wychoi","onFailure"); // OK
             }
         });
 
-        return view;
     }
-
-    @Override
-    public void onFabClick() {
-        Log.d("wychoi","MemoListViewFragment"); // OK
-        //여기에 알람 생성하는 매소드 만들어서 넣자!
-        //mTimePickerDialogController.show(0, 0, makeTimePickerDialogTag());
-    }
-
-
 }

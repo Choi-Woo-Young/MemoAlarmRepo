@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements ObservableScrollV
         super.onCreate(savedInstanceState);
 
         ApplicationController application = ApplicationController.getInstance();
-        application.buildNetworkService("192.168.219.115", 8080);
+        application.buildNetworkService("192.168.43.217", 8080);
         //application.buildNetworkService("192.168.0.102", 8080);
         //application.buildNetworkService("api.openweathermap.org", 80);
         networkService = ApplicationController.getInstance().getNetworkService();
